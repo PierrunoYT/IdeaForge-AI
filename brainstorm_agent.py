@@ -4,6 +4,10 @@ import os
 from collections import defaultdict
 
 class BrainstormAgent:
+    @staticmethod
+    def get_user_input():
+        """Get user input for the brainstorming topic."""
+        return input("Enter your brainstorming prompt: ")
     def __init__(self, api_key):
         self.ideas = []
         self.mind_map = defaultdict(list)
@@ -56,16 +60,16 @@ if __name__ == "__main__":
         raise ValueError("Please set the OPENROUTER_API_KEY environment variable")
     
     agent = BrainstormAgent(api_key)
-    topic = "product design"
+    topic = BrainstormAgent.get_user_input()
     
-    print(f"Generating ideas for: {topic}")
+    print(f"\nGenerating ideas for: {topic}")
     ideas = agent.generate_ideas(topic)
-    print("Generated ideas:")
+    print("\nGenerated ideas:")
     for idea in ideas:
         print(f"- {idea}")
     
     print("\nCreating mind map...")
     agent.create_mind_map()
     
-    print("Mind Map:")
+    print("\nMind Map:")
     agent.print_mind_map()

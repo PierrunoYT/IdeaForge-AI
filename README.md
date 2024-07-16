@@ -28,7 +28,11 @@ Run the script with:
 python brainstorm_agent.py
 ```
 
-The script will generate ideas for "product design" by default. You can modify the topic in the script as needed.
+When prompted, enter your brainstorming topic or question. For example:
+- "Create a mindmap about new viral products to sell on Alibaba"
+- "Please brainstorm ideas about pizza and tech"
+
+The script will generate ideas based on your input and create a mind map from those ideas.
 
 ## Requirements
 
