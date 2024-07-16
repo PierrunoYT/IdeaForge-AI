@@ -11,11 +11,7 @@ BrainstormAgent is a Python-based tool that uses OpenRouter's Anthropic Claude-3
 ## Installation
 
 1. Clone this repository
-2. Install Graphviz on your system:
-   - On Windows: Download and install from [Graphviz website](https://graphviz.org/download/)
-   - On macOS: `brew install graphviz`
-   - On Ubuntu/Debian: `sudo apt-get install graphviz`
-3. Create a virtual environment:
+2. Create a virtual environment:
    ```
    python -m venv venv
    ```
