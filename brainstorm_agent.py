@@ -308,3 +308,4 @@ if __name__ == "__main__":
         with open(filename, 'w') as f:
             json.dump(self.mind_map, f, indent=2)
         print(f"Mind map has been exported as {filename}")
+# Rename this file to ideaforge_ai.py

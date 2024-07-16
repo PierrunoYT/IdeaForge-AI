@@ -1,6 +1,6 @@
-# BrainstormAgent
+# IdeaForge AI
 
-BrainstormAgent is a Python-based tool that uses OpenRouter's Anthropic Claude-3.5-sonnet model to generate innovative ideas and create mind maps for various topics.
+IdeaForge AI is a Python-based tool that uses OpenRouter's Anthropic Claude-3.5-sonnet model to generate innovative ideas and create mind maps for various topics.
 
 ## Features
 
@@ -44,7 +44,7 @@ Make sure your virtual environment is activated before running the script.
 Run the script with:
 
 ```
-python brainstorm_agent.py
+python ideaforge_ai.py
 ```
 
 When prompted:
