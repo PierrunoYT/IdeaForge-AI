@@ -5,7 +5,7 @@ Unleash your creativity with IdeaForge AI! This Python-based tool harnesses the 
 ## Features
 
 - 🧠 Generate creative ideas using advanced AI
-- 🗺️ Visualize concepts with auto-generated mind maps
+- 🗺️ Visualize concepts with auto-generated network graphs
 - 💻 User-friendly command-line interface
 - 📄 Export ideas to Word documents
 
@@ -63,7 +63,7 @@ Follow these steps to quickly set up and start using IdeaForge AI:
 3. Follow the prompts:
    - Enter your brainstorming topic (e.g., "New viral products for Alibaba" or "Pizza and tech innovations")
    - Choose output format:
-     - Option 1: Generate a mind map (saved as "mind_map.png")
+     - Option 1: Generate a network graph (saved as "idea_network.png")
      - Option 2: Save ideas to a Word document ("brainstorm_ideas.docx")
 
 ## Contributing
