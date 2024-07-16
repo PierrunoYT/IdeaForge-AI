@@ -3,6 +3,7 @@ import requests
 import os
 from collections import defaultdict
 from dotenv import load_dotenv
+from docx import Document
 
 # Load environment variables from .env file
 load_dotenv()
@@ -10,10 +11,10 @@ load_dotenv()
 class BrainstormAgent:
     @staticmethod
     def get_user_input():
-        """Get user input for the brainstorming topic and mind map option."""
+        """Get user input for the brainstorming topic and output option."""
         topic = input("Enter your brainstorming prompt: ")
-        generate_mindmap = input("Do you want to generate a mind map directly? (yes/no): ").lower() == 'yes'
-        return topic, generate_mindmap
+        output_option = input("Choose output option (1: Generate mind map, 2: Print ideas to Word file): ")
+        return topic, output_option
     def __init__(self, api_key):
         self.ideas = []
         self.mind_map = defaultdict(list)
@@ -59,6 +60,15 @@ class BrainstormAgent:
                 print(f"  - {value}")
             print()
 
+    def write_ideas_to_word(self, filename="brainstorm_ideas.docx"):
+        """Write generated ideas to a Word document."""
+        doc = Document()
+        doc.add_heading('Brainstorming Ideas', 0)
+        for idea in self.ideas:
+            doc.add_paragraph(idea, style='List Bullet')
+        doc.save(filename)
+        print(f"Ideas have been written to {filename}")
+
     def generate_mind_map(self, topic):
         """Generate a mind map directly using OpenRouter API."""
         prompt = f"Create a mind map for the topic: {topic}. Provide the output as a JSON object where keys are main concepts and values are lists of related ideas."
@@ -95,20 +105,19 @@ if __name__ == "__main__":
         raise ValueError("Please set the OPENROUTER_API_KEY in the .env file")
     
     agent = BrainstormAgent(api_key)
-    topic, generate_mindmap = BrainstormAgent.get_user_input()
+    topic, output_option = BrainstormAgent.get_user_input()
     
-    if generate_mindmap:
+    if output_option == "1":
         print(f"\nGenerating mind map for: {topic}")
         agent.generate_mind_map(topic)
-    else:
+        print("\nMind Map:")
+        agent.print_mind_map()
+    elif output_option == "2":
         print(f"\nGenerating ideas for: {topic}")
         ideas = agent.generate_ideas(topic)
         print("\nGenerated ideas:")
         for idea in ideas:
             print(f"- {idea}")
-        
-        print("\nCreating mind map...")
-        agent.create_mind_map()
-    
-    print("\nMind Map:")
-    agent.print_mind_map()
+        agent.write_ideas_to_word()
+    else:
+        print("Invalid option selected. Please run the script again and choose either 1 or 2.")

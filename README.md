@@ -32,11 +32,11 @@ When prompted:
 1. Enter your brainstorming topic or question. For example:
    - "Create a mindmap about new viral products to sell on Alibaba"
    - "Please brainstorm ideas about pizza and tech"
-2. Choose whether you want to generate a mind map directly or generate ideas first:
-   - If you choose "yes" for generating a mind map directly, the script will create a mind map using the AI model.
-   - If you choose "no", the script will generate ideas based on your input and then create a mind map from those ideas.
+2. Choose your output option:
+   - Enter "1" to generate a mind map directly using the AI model.
+   - Enter "2" to generate ideas and save them to a Word document.
 
-The script will display the resulting mind map in both cases.
+The script will either display the resulting mind map or save the ideas to a Word file named "brainstorm_ideas.docx" in the current directory.
 
 ## Requirements
 
