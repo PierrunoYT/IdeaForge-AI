@@ -28,11 +28,15 @@ Run the script with:
 python brainstorm_agent.py
 ```
 
-When prompted, enter your brainstorming topic or question. For example:
-- "Create a mindmap about new viral products to sell on Alibaba"
-- "Please brainstorm ideas about pizza and tech"
+When prompted:
+1. Enter your brainstorming topic or question. For example:
+   - "Create a mindmap about new viral products to sell on Alibaba"
+   - "Please brainstorm ideas about pizza and tech"
+2. Choose whether you want to generate a mind map directly or generate ideas first:
+   - If you choose "yes" for generating a mind map directly, the script will create a mind map using the AI model.
+   - If you choose "no", the script will generate ideas based on your input and then create a mind map from those ideas.
 
-The script will generate ideas based on your input and create a mind map from those ideas.
+The script will display the resulting mind map in both cases.
 
 ## Requirements
 
