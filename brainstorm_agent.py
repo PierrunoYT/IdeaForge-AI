@@ -1,20 +1,37 @@
 import random
+import requests
+import os
 from collections import defaultdict
 
 class BrainstormAgent:
-    def __init__(self):
+    def __init__(self, api_key):
         self.ideas = []
         self.mind_map = defaultdict(list)
+        self.api_key = api_key
+        self.base_url = "https://openrouter.ai/api/v1/chat/completions"
 
     def generate_ideas(self, topic, num_ideas=10):
-        """Generate a list of ideas related to the given topic."""
-        # In a real implementation, this would use more sophisticated NLP techniques
-        # For now, we'll use a simple random word generator as a placeholder
-        words = ["innovative", "creative", "efficient", "sustainable", "digital",
-                 "automated", "intelligent", "flexible", "scalable", "user-friendly"]
+        """Generate a list of ideas related to the given topic using OpenRouter API."""
+        prompt = f"Generate {num_ideas} innovative ideas related to {topic}. Provide each idea as a short phrase or sentence."
         
-        self.ideas = [f"{random.choice(words)} {topic}" for _ in range(num_ideas)]
-        return self.ideas
+        headers = {
+            "Authorization": f"Bearer {self.api_key}",
+            "Content-Type": "application/json"
+        }
+        
+        data = {
+            "model": "openrouter/anthropic/claude-3.5-sonnet",
+            "messages": [{"role": "user", "content": prompt}]
+        }
+        
+        response = requests.post(self.base_url, json=data, headers=headers)
+        response.raise_for_status()
+        
+        result = response.json()
+        ideas_text = result['choices'][0]['message']['content']
+        
+        self.ideas = [idea.strip() for idea in ideas_text.split('\n') if idea.strip()]
+        return self.ideas[:num_ideas]  # Ensure we return exactly num_ideas
 
     def create_mind_map(self):
         """Create a mind map from the generated ideas."""
@@ -34,7 +51,11 @@ class BrainstormAgent:
 
 # Example usage
 if __name__ == "__main__":
-    agent = BrainstormAgent()
+    api_key = os.environ.get("OPENROUTER_API_KEY")
+    if not api_key:
+        raise ValueError("Please set the OPENROUTER_API_KEY environment variable")
+    
+    agent = BrainstormAgent(api_key)
     topic = "product design"
     
     print(f"Generating ideas for: {topic}")
