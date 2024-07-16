@@ -2,6 +2,10 @@ import random
 import requests
 import os
 from collections import defaultdict
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 class BrainstormAgent:
     @staticmethod
@@ -55,9 +59,9 @@ class BrainstormAgent:
 
 # Example usage
 if __name__ == "__main__":
-    api_key = os.environ.get("OPENROUTER_API_KEY")
+    api_key = os.getenv("OPENROUTER_API_KEY")
     if not api_key:
-        raise ValueError("Please set the OPENROUTER_API_KEY environment variable")
+        raise ValueError("Please set the OPENROUTER_API_KEY in the .env file")
     
     agent = BrainstormAgent(api_key)
     topic = BrainstormAgent.get_user_input()

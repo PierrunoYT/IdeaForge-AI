@@ -15,9 +15,9 @@ BrainstormAgent is a Python-based tool that uses OpenRouter's Anthropic Claude-3
    ```
    pip install -r requirements.txt
    ```
-3. Set up your OpenRouter API key as an environment variable:
+3. Create a `.env` file in the project root directory and add your OpenRouter API key:
    ```
-   export OPENROUTER_API_KEY=your_api_key_here
+   OPENROUTER_API_KEY=your_api_key_here
    ```
 
 ## Usage
