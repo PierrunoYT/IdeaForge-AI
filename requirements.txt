@@ -1,5 +1,5 @@
-requests==2.26.0
-python-dotenv==0.19.1
-python-docx==0.8.11
-networkx==2.6.3
-matplotlib==3.5.3
+requests==2.32.3
+python-dotenv==1.0.1 
+python-docx==1.1.2
+networkx==3.3 
+matplotlib==3.9.1 
