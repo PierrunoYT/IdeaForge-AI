@@ -1,66 +1,85 @@
 # IdeaForge AI
 
-IdeaForge AI is a Python-based tool that uses OpenRouter's Anthropic Claude-3.5-sonnet model to generate innovative ideas and create mind maps for various topics.
+Unleash your creativity with IdeaForge AI! This Python-based tool harnesses the power of OpenRouter's Anthropic Claude-3.5-sonnet model to generate innovative ideas and create mind maps for any topic you can imagine.
 
 ## Features
 
-- Generate ideas using advanced AI model
-- Create mind maps from generated ideas
-- Simple command-line interface
+- 🧠 Generate creative ideas using advanced AI
+- 🗺️ Visualize concepts with auto-generated mind maps
+- 💻 User-friendly command-line interface
+- 📄 Export ideas to Word documents
+
+## Getting Started
+
+Follow these steps to quickly set up and start using IdeaForge AI:
+
+1. Clone the repository
+2. Install dependencies: `pip install -r requirements.txt`
+3. Set up your OpenRouter API key in a `.env` file
+4. Run the script: `python ideaforge_ai.py`
 
 ## Installation
 
-1. Clone this repository
-2. Create a virtual environment:
+1. Clone this repository:
+   ```
+   git clone https://github.com/yourusername/ideaforge-ai.git
+   cd ideaforge-ai
+   ```
+
+2. Set up a virtual environment:
    ```
    python -m venv venv
+   source venv/bin/activate  # On Windows, use `venv\Scripts\activate`
    ```
-4. Activate the virtual environment:
-   - On Windows:
-     ```
-     venv\Scripts\activate
-     ```
-   - On macOS and Linux:
-     ```
-     source venv/bin/activate
-     ```
-5. Install the required dependencies:
+
+3. Install dependencies:
    ```
    pip install -r requirements.txt
    ```
-6. Create a `.env` file in the project root directory and add your OpenRouter API key:
+
+4. Set up your API key:
+   Create a `.env` file in the project root and add:
    ```
    OPENROUTER_API_KEY=your_api_key_here
    ```
-7. The script will automatically download the required NLTK data on first run. If you want to download it manually, you can run:
+
+5. Download NLTK data (automatic on first run, or manually):
    ```
    python -c "import nltk; nltk.download('stopwords')"
    ```
 
 ## Usage
 
-Make sure your virtual environment is activated before running the script.
+1. Activate your virtual environment:
+   ```
+   source venv/bin/activate  # On Windows, use `venv\Scripts\activate`
+   ```
 
-Run the script with:
+2. Run the script:
+   ```
+   python ideaforge_ai.py
+   ```
 
-```
-python ideaforge_ai.py
-```
+3. Follow the prompts:
+   - Enter your brainstorming topic (e.g., "New viral products for Alibaba" or "Pizza and tech innovations")
+   - Choose output format:
+     - Option 1: Generate a mind map (saved as "mind_map.png")
+     - Option 2: Save ideas to a Word document ("brainstorm_ideas.docx")
 
-When prompted:
-1. Enter your brainstorming topic or question. For example:
-   - "Create a mindmap about new viral products to sell on Alibaba"
-   - "Please brainstorm ideas about pizza and tech"
-2. Choose your output option:
-   - Enter "1" to generate a mind map using the AI model and Graphviz.
-   - Enter "2" to generate ideas and save them to a Word document.
+## Contributing
 
-The script will either create a Graphviz mind map (saved as "mind_map.png") or save the ideas to a Word file named "brainstorm_ideas.docx" in the current directory.
+We welcome contributions! If you'd like to improve IdeaForge AI:
 
-## Requirements
-
-See `requirements.txt` for a list of required Python packages.
+1. Fork the repository
+2. Create a new branch: `git checkout -b feature/your-feature-name`
+3. Make your changes and commit them: `git commit -m 'Add some feature'`
+4. Push to the branch: `git push origin feature/your-feature-name`
+5. Submit a pull request
 
 ## License
 
 This project is open-source and available under the MIT License.
+
+## Requirements
+
+See `requirements.txt` for a list of required Python packages.
