@@ -11,11 +11,15 @@ BrainstormAgent is a Python-based tool that uses OpenRouter's Anthropic Claude-3
 ## Installation
 
 1. Clone this repository
-2. Create a virtual environment:
+2. Install Graphviz on your system:
+   - On Windows: Download and install from [Graphviz website](https://graphviz.org/download/)
+   - On macOS: `brew install graphviz`
+   - On Ubuntu/Debian: `sudo apt-get install graphviz`
+3. Create a virtual environment:
    ```
    python -m venv venv
    ```
-3. Activate the virtual environment:
+4. Activate the virtual environment:
    - On Windows:
      ```
      venv\Scripts\activate
@@ -24,11 +28,11 @@ BrainstormAgent is a Python-based tool that uses OpenRouter's Anthropic Claude-3
      ```
      source venv/bin/activate
      ```
-4. Install the required dependencies:
+5. Install the required dependencies:
    ```
    pip install -r requirements.txt
    ```
-5. Create a `.env` file in the project root directory and add your OpenRouter API key:
+6. Create a `.env` file in the project root directory and add your OpenRouter API key:
    ```
    OPENROUTER_API_KEY=your_api_key_here
    ```
@@ -48,10 +52,10 @@ When prompted:
    - "Create a mindmap about new viral products to sell on Alibaba"
    - "Please brainstorm ideas about pizza and tech"
 2. Choose your output option:
-   - Enter "1" to generate a mind map directly using the AI model.
+   - Enter "1" to generate a mind map using the AI model and Graphviz.
    - Enter "2" to generate ideas and save them to a Word document.
 
-The script will either display the resulting mind map or save the ideas to a Word file named "brainstorm_ideas.docx" in the current directory.
+The script will either create a Graphviz mind map (saved as "mind_map.png") or save the ideas to a Word file named "brainstorm_ideas.docx" in the current directory.
 
 ## Requirements
 

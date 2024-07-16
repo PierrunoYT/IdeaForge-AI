@@ -4,6 +4,7 @@ import os
 from collections import defaultdict
 from dotenv import load_dotenv
 from docx import Document
+import graphviz
 
 # Load environment variables from .env file
 load_dotenv()
@@ -60,6 +61,29 @@ class BrainstormAgent:
                 print(f"  - {value}")
             print()
 
+    def create_graphviz_mind_map(self, output_file="mind_map"):
+        """Create a Graphviz mind map from the generated ideas."""
+        dot = graphviz.Digraph(comment='Mind Map')
+        dot.attr(rankdir='LR', size='8,5')
+
+        # Add the main topic
+        main_topic = list(self.mind_map.keys())[0]
+        dot.node('main', main_topic)
+
+        # Add subtopics and their ideas
+        for subtopic, ideas in self.mind_map[main_topic].items():
+            dot.node(subtopic, subtopic)
+            dot.edge('main', subtopic)
+            
+            for i, idea in enumerate(ideas):
+                idea_id = f"{subtopic}_{i}"
+                dot.node(idea_id, idea)
+                dot.edge(subtopic, idea_id)
+
+        # Render the graph
+        dot.render(output_file, format='png', cleanup=True)
+        print(f"Mind map has been saved as {output_file}.png")
+
     def write_ideas_to_word(self, filename="brainstorm_ideas.docx"):
         """Write generated ideas to a Word document."""
         doc = Document()
@@ -70,8 +94,8 @@ class BrainstormAgent:
         print(f"Ideas have been written to {filename}")
 
     def generate_mind_map(self, topic):
-        """Generate a mind map directly using OpenRouter API."""
-        prompt = f"Create a mind map for the topic: {topic}. Provide the output as a JSON object where keys are main concepts and values are lists of related ideas."
+        """Generate a mind map structure using OpenRouter API."""
+        prompt = f"Create a mind map for the topic: {topic}. Provide the output as a JSON object where the key is the main topic and the value is a dictionary of subtopics and their related ideas."
         
         headers = {
             "Authorization": f"Bearer {self.api_key}",
@@ -118,8 +142,9 @@ if __name__ == "__main__":
         print(f"\nGenerating mind map for: {topic}")
         mind_map = agent.generate_mind_map(topic)
         if mind_map:
-            print("\nMind Map:")
+            print("\nMind Map structure:")
             agent.print_mind_map()
+            agent.create_graphviz_mind_map()
         else:
             print("Failed to generate mind map. Please check your API key and try again.")
     elif output_option == "2":
