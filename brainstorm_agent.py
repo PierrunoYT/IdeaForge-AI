@@ -31,7 +31,7 @@ class BrainstormAgent:
         }
         
         data = {
-            "model": "openrouter/anthropic/claude-3.5-sonnet",
+            "model": "anthropic/claude-3.5-sonnet",
             "messages": [{"role": "user", "content": prompt}]
         }
         
@@ -79,7 +79,7 @@ class BrainstormAgent:
         }
         
         data = {
-            "model": "anthropic/claude-3-sonnet-20240229",
+            "model": "anthropic/claude-3.5-sonnet",
             "messages": [{"role": "user", "content": prompt}]
         }
         
