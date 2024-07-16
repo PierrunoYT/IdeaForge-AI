@@ -12,6 +12,7 @@ from matplotlib.patches import Circle
 from matplotlib.collections import PatchCollection
 from textblob import TextBlob
 from rake_nltk import Rake
+import nltk
 
 # Load environment variables from .env file
 load_dotenv()
@@ -30,6 +31,14 @@ class BrainstormAgent:
         self.mind_map = defaultdict(list)
         self.api_key = api_key
         self.base_url = "https://openrouter.ai/api/v1/chat/completions"
+        
+        # Download NLTK data if not already present
+        try:
+            nltk.data.find('corpora/stopwords')
+        except LookupError:
+            print("Downloading NLTK stopwords...")
+            nltk.download('stopwords', quiet=True)
+        
         self.rake = Rake()
 
     def analyze_sentiment(self, text):

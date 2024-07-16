@@ -32,6 +32,10 @@ BrainstormAgent is a Python-based tool that uses OpenRouter's Anthropic Claude-3
    ```
    OPENROUTER_API_KEY=your_api_key_here
    ```
+7. The script will automatically download the required NLTK data on first run. If you want to download it manually, you can run:
+   ```
+   python -c "import nltk; nltk.download('stopwords')"
+   ```
 
 ## Usage
 
