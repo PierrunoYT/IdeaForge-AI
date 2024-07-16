@@ -145,8 +145,27 @@ class BrainstormAgent:
         print(f"Ideas have been written to {filename}")
 
     def generate_mind_map(self, topic):
-        """Generate a mind map structure using OpenRouter API."""
-        prompt = f"Create a mind map for the topic: {topic}. Provide the output as a JSON object where the key is the main topic and the value is a dictionary of subtopics and their related ideas."
+        """Generate a comprehensive mind map structure using OpenRouter API."""
+        prompt = f"""Create a detailed mind map for the topic: {topic}.
+        The mind map should have the following structure:
+        1. Main topic
+        2. At least 5 subtopics
+        3. For each subtopic, provide at least 3 related ideas or concepts
+        
+        Provide the output as a JSON object where:
+        - The key is the main topic
+        - The value is a dictionary of subtopics
+        - Each subtopic has an array of related ideas
+
+        Example format:
+        {{
+            "Main Topic": {{
+                "Subtopic 1": ["Idea 1", "Idea 2", "Idea 3"],
+                "Subtopic 2": ["Idea 1", "Idea 2", "Idea 3"],
+                ...
+            }}
+        }}
+        """
         
         headers = {
             "Authorization": f"Bearer {self.api_key}",
