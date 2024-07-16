@@ -3,6 +3,8 @@ import os
 from collections import defaultdict
 from dotenv import load_dotenv
 from docx import Document
+import networkx as nx
+import matplotlib.pyplot as plt
 
 # Load environment variables from .env file
 load_dotenv()
@@ -58,6 +60,44 @@ class BrainstormAgent:
             for value in values:
                 print(f"  - {value}")
             print()
+
+    def create_networkx_mind_map(self, output_file="mind_map.png"):
+        """Create a NetworkX mind map from the generated ideas."""
+        G = nx.Graph()
+        
+        # Add nodes and edges
+        main_topic = list(self.mind_map.keys())[0]
+        G.add_node(main_topic, color='lightblue', size=3000)
+        
+        for subtopic, ideas in self.mind_map[main_topic].items():
+            G.add_node(subtopic, color='lightgreen', size=2000)
+            G.add_edge(main_topic, subtopic)
+            
+            for idea in ideas:
+                G.add_node(idea, color='lightyellow', size=1000)
+                G.add_edge(subtopic, idea)
+        
+        # Set up the plot
+        plt.figure(figsize=(12, 8))
+        pos = nx.spring_layout(G, k=0.9, iterations=50)
+        
+        # Draw nodes
+        nx.draw_networkx_nodes(G, pos, node_size=[G.nodes[node]['size'] for node in G.nodes()],
+                               node_color=[G.nodes[node]['color'] for node in G.nodes()])
+        
+        # Draw edges
+        nx.draw_networkx_edges(G, pos)
+        
+        # Draw labels
+        nx.draw_networkx_labels(G, pos, font_size=8, font_weight="bold")
+        
+        # Save the plot
+        plt.axis('off')
+        plt.tight_layout()
+        plt.savefig(output_file, format="png", dpi=300, bbox_inches="tight")
+        plt.close()
+        
+        print(f"Mind map has been saved as {output_file}")
 
 
     def write_ideas_to_word(self, filename="brainstorm_ideas.docx"):
@@ -120,6 +160,7 @@ if __name__ == "__main__":
         if mind_map:
             print("\nMind Map structure:")
             agent.print_mind_map()
+            agent.create_networkx_mind_map()
         else:
             print("Failed to generate mind map. Please check your API key and try again.")
     elif output_option == "2":
