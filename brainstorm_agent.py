@@ -79,24 +79,31 @@ class BrainstormAgent:
         }
         
         data = {
-            "model": "openrouter/anthropic/claude-3.5-sonnet",
+            "model": "anthropic/claude-3-sonnet-20240229",
             "messages": [{"role": "user", "content": prompt}]
         }
         
-        response = requests.post(self.base_url, json=data, headers=headers)
-        response.raise_for_status()
-        
-        result = response.json()
-        mind_map_text = result['choices'][0]['message']['content']
-        
-        # Extract the JSON part from the response
-        import json
-        start = mind_map_text.find('{')
-        end = mind_map_text.rfind('}') + 1
-        mind_map_json = mind_map_text[start:end]
-        
-        self.mind_map = json.loads(mind_map_json)
-        return self.mind_map
+        try:
+            response = requests.post(self.base_url, json=data, headers=headers)
+            response.raise_for_status()
+            
+            result = response.json()
+            mind_map_text = result['choices'][0]['message']['content']
+            
+            # Extract the JSON part from the response
+            import json
+            start = mind_map_text.find('{')
+            end = mind_map_text.rfind('}') + 1
+            mind_map_json = mind_map_text[start:end]
+            
+            self.mind_map = json.loads(mind_map_json)
+            return self.mind_map
+        except requests.exceptions.RequestException as e:
+            print(f"An error occurred: {e}")
+            if hasattr(e, 'response') and e.response is not None:
+                print(f"Response status code: {e.response.status_code}")
+                print(f"Response content: {e.response.text}")
+            return None
 
 # Example usage
 if __name__ == "__main__":
@@ -109,9 +116,12 @@ if __name__ == "__main__":
     
     if output_option == "1":
         print(f"\nGenerating mind map for: {topic}")
-        agent.generate_mind_map(topic)
-        print("\nMind Map:")
-        agent.print_mind_map()
+        mind_map = agent.generate_mind_map(topic)
+        if mind_map:
+            print("\nMind Map:")
+            agent.print_mind_map()
+        else:
+            print("Failed to generate mind map. Please check your API key and try again.")
     elif output_option == "2":
         print(f"\nGenerating ideas for: {topic}")
         ideas = agent.generate_ideas(topic)
