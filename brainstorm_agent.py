@@ -13,19 +13,23 @@ load_dotenv()
 class BrainstormAgent:
     @staticmethod
     def get_user_input():
-        """Get user input for the brainstorming topic and output option."""
-        topic = input("Enter your brainstorming prompt: ")
-        output_option = input("Choose output option (1: Generate mind map, 2: Print ideas to Word file): ")
-        return topic, output_option
+        """Get user input for the brainstorming topic, output option, and language."""
+        language = input("Choose language (1: English, 2: German): ")
+        topic = input("Enter your brainstorming prompt: " if language == "1" else "Geben Sie Ihr Brainstorming-Thema ein: ")
+        output_option = input("Choose output option (1: Generate mind map, 2: Print ideas to Word file): " if language == "1" else "Wählen Sie die Ausgabeoption (1: Mindmap generieren, 2: Ideen in Word-Datei drucken): ")
+        return topic, output_option, language
     def __init__(self, api_key):
         self.ideas = []
         self.mind_map = defaultdict(list)
         self.api_key = api_key
         self.base_url = "https://openrouter.ai/api/v1/chat/completions"
 
-    def generate_ideas(self, topic, num_ideas=10):
+    def generate_ideas(self, topic, num_ideas=10, language="1"):
         """Generate a list of ideas related to the given topic using OpenRouter API."""
-        prompt = f"Generate {num_ideas} innovative ideas related to {topic}. Provide each idea as a short phrase or sentence."
+        if language == "1":
+            prompt = f"Generate {num_ideas} innovative ideas related to {topic}. Provide each idea as a short phrase or sentence."
+        else:
+            prompt = f"Generiere {num_ideas} innovative Ideen zu {topic}. Gib jede Idee als kurze Phrase oder einen Satz an."
         
         headers = {
             "Authorization": f"Bearer {self.api_key}",
@@ -144,28 +148,50 @@ class BrainstormAgent:
         doc.save(filename)
         print(f"Ideas have been written to {filename}")
 
-    def generate_mind_map(self, topic):
+    def generate_mind_map(self, topic, language="1"):
         """Generate a comprehensive mind map structure using OpenRouter API."""
-        prompt = f"""Create a detailed mind map for the topic: {topic}.
-        The mind map should have the following structure:
-        1. Main topic
-        2. At least 5 subtopics
-        3. For each subtopic, provide at least 3 related ideas or concepts
-        
-        Provide the output as a JSON object where:
-        - The key is the main topic
-        - The value is a dictionary of subtopics
-        - Each subtopic has an array of related ideas
+        if language == "1":
+            prompt = f"""Create a detailed mind map for the topic: {topic}.
+            The mind map should have the following structure:
+            1. Main topic
+            2. At least 5 subtopics
+            3. For each subtopic, provide at least 3 related ideas or concepts
+            
+            Provide the output as a JSON object where:
+            - The key is the main topic
+            - The value is a dictionary of subtopics
+            - Each subtopic has an array of related ideas
 
-        Example format:
-        {{
-            "Main Topic": {{
-                "Subtopic 1": ["Idea 1", "Idea 2", "Idea 3"],
-                "Subtopic 2": ["Idea 1", "Idea 2", "Idea 3"],
-                ...
+            Example format:
+            {{
+                "Main Topic": {{
+                    "Subtopic 1": ["Idea 1", "Idea 2", "Idea 3"],
+                    "Subtopic 2": ["Idea 1", "Idea 2", "Idea 3"],
+                    ...
+                }}
             }}
-        }}
-        """
+            """
+        else:
+            prompt = f"""Erstelle eine detaillierte Mindmap für das Thema: {topic}.
+            Die Mindmap sollte folgende Struktur haben:
+            1. Hauptthema
+            2. Mindestens 5 Unterthemen
+            3. Für jedes Unterthema mindestens 3 verwandte Ideen oder Konzepte
+            
+            Gib die Ausgabe als JSON-Objekt an, wobei:
+            - Der Schlüssel das Hauptthema ist
+            - Der Wert ein Wörterbuch der Unterthemen ist
+            - Jedes Unterthema ein Array verwandter Ideen hat
+
+            Beispielformat:
+            {{
+                "Hauptthema": {{
+                    "Unterthema 1": ["Idee 1", "Idee 2", "Idee 3"],
+                    "Unterthema 2": ["Idee 1", "Idee 2", "Idee 3"],
+                    ...
+                }}
+            }}
+            """
         
         headers = {
             "Authorization": f"Bearer {self.api_key}",
@@ -206,23 +232,23 @@ if __name__ == "__main__":
         raise ValueError("Please set the OPENROUTER_API_KEY in the .env file")
     
     agent = BrainstormAgent(api_key)
-    topic, output_option = BrainstormAgent.get_user_input()
+    topic, output_option, language = BrainstormAgent.get_user_input()
     
     if output_option == "1":
-        print(f"\nGenerating mind map for: {topic}")
-        mind_map = agent.generate_mind_map(topic)
+        print(f"\nGenerating mind map for: {topic}" if language == "1" else f"\nMindmap wird generiert für: {topic}")
+        mind_map = agent.generate_mind_map(topic, language)
         if mind_map:
-            print("\nMind Map structure:")
+            print("\nMind Map structure:" if language == "1" else "\nMindmap-Struktur:")
             agent.print_mind_map()
             agent.create_networkx_mind_map()
         else:
-            print("Failed to generate mind map. Please check your API key and try again.")
+            print("Failed to generate mind map. Please check your API key and try again." if language == "1" else "Fehler beim Generieren der Mindmap. Bitte überprüfen Sie Ihren API-Schlüssel und versuchen Sie es erneut.")
     elif output_option == "2":
-        print(f"\nGenerating ideas for: {topic}")
-        ideas = agent.generate_ideas(topic)
-        print("\nGenerated ideas:")
+        print(f"\nGenerating ideas for: {topic}" if language == "1" else f"\nIdeen werden generiert für: {topic}")
+        ideas = agent.generate_ideas(topic, language=language)
+        print("\nGenerated ideas:" if language == "1" else "\nGenerierte Ideen:")
         for idea in ideas:
             print(f"- {idea}")
         agent.write_ideas_to_word()
     else:
-        print("Invalid option selected. Please run the script again and choose either 1 or 2.")
+        print("Invalid option selected. Please run the script again and choose either 1 or 2." if language == "1" else "Ungültige Option ausgewählt. Bitte führen Sie das Skript erneut aus und wählen Sie entweder 1 oder 2.")
