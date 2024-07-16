@@ -1,1 +1,22 @@
 .aider*
+# Ignore .env file containing sensitive information
+.env
+
+# Python virtual environment
+venv/
+
+# Python cache files
+__pycache__/
+*.pyc
+
+# IDE-specific files
+.vscode/
+.idea/
+
+# Operating system files
+.DS_Store
+Thumbs.db
+
+# Output files
+mind_map.png
+brainstorm_ideas.docx
