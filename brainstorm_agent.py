@@ -6,6 +6,8 @@ from docx import Document
 import networkx as nx
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
+from matplotlib.patches import Circle
+from matplotlib.collections import PatchCollection
 
 # Load environment variables from .env file
 load_dotenv()
@@ -67,54 +69,62 @@ class BrainstormAgent:
             print()
 
     def create_networkx_mind_map(self, output_file="mind_map.png"):
-        """Create a visually appealing NetworkX mind map from the generated ideas."""
-        G = nx.DiGraph()
+        """Create a modern and visually appealing NetworkX mind map from the generated ideas."""
+        G = nx.Graph()
         
         # Color palette
-        colors = list(mcolors.TABLEAU_COLORS.values())
+        colors = plt.cm.viridis(np.linspace(0, 1, 10))
         
         # Add nodes and edges
         main_topic = list(self.mind_map.keys())[0]
-        G.add_node(main_topic, color=colors[0], size=7000)
+        G.add_node(main_topic, color=colors[0], size=8000)
         
         for i, (subtopic, ideas) in enumerate(self.mind_map[main_topic].items()):
             subtopic_color = colors[(i + 1) % len(colors)]
-            G.add_node(subtopic, color=subtopic_color, size=5000)
+            G.add_node(subtopic, color=subtopic_color, size=6000)
             G.add_edge(main_topic, subtopic)
             
             for j, idea in enumerate(ideas):
                 idea_color = mcolors.to_rgba(subtopic_color, alpha=0.7)
-                G.add_node(idea, color=idea_color, size=3000)
+                G.add_node(idea, color=idea_color, size=4000)
                 G.add_edge(subtopic, idea)
         
         # Set up the plot
-        plt.figure(figsize=(20, 15))
-        pos = nx.spring_layout(G, k=0.9, iterations=50)
+        plt.figure(figsize=(24, 18), facecolor='#f0f0f0')
+        pos = nx.spring_layout(G, k=0.5, iterations=50)
         
         # Draw edges
-        nx.draw_networkx_edges(G, pos, edge_color='gray', arrows=True, arrowsize=20, arrowstyle='->')
+        nx.draw_networkx_edges(G, pos, edge_color='#d0d0d0', width=1.5, alpha=0.7)
         
-        # Draw nodes
+        # Draw nodes with gradients
         node_colors = [G.nodes[node]['color'] for node in G.nodes()]
         node_sizes = [G.nodes[node]['size'] for node in G.nodes()]
-        nx.draw_networkx_nodes(G, pos, node_color=node_colors, node_size=node_sizes, alpha=0.9)
+        
+        for node, (x, y) in pos.items():
+            color = G.nodes[node]['color']
+            size = G.nodes[node]['size'] / 1000
+            gradient = plt.cm.Blues(np.linspace(0.2, 0.8, 256))
+            radial_gradient = mcolors.LinearSegmentedColormap.from_list("", [color, "white"])
+            circle = Circle((x, y), size/200, facecolor="none")
+            plt.gca().add_patch(circle)
+            plt.gca().add_collection(PatchCollection([circle], facecolors=[radial_gradient(np.linspace(0, 1, 256))]))
         
         # Draw labels
         labels = {node: self.wrap_text(node, 20) for node in G.nodes()}
-        font_sizes = {node: 14 if G.nodes[node]['size'] > 5000 else 10 if G.nodes[node]['size'] > 3000 else 8 for node in G.nodes()}
+        font_sizes = {node: 16 if G.nodes[node]['size'] > 6000 else 12 if G.nodes[node]['size'] > 4000 else 10 for node in G.nodes()}
         for node, (x, y) in pos.items():
-            plt.text(x, y, labels[node], fontsize=font_sizes[node], ha='center', va='center', wrap=True, fontweight='bold')
+            plt.text(x, y, labels[node], fontsize=font_sizes[node], ha='center', va='center', wrap=True, fontweight='bold', color='#303030')
         
-        # Add a light background
-        plt.gca().set_facecolor('#F0F0F0')
+        # Add a subtle grid
+        plt.grid(color='#e0e0e0', linestyle='--', linewidth=0.5, alpha=0.5)
         
         # Save the plot
         plt.axis('off')
         plt.tight_layout()
-        plt.savefig(output_file, format="png", dpi=300, bbox_inches="tight", facecolor='#F0F0F0', edgecolor='none')
+        plt.savefig(output_file, format="png", dpi=300, bbox_inches="tight", facecolor='#f0f0f0', edgecolor='none')
         plt.close()
         
-        print(f"Mind map has been saved as {output_file}")
+        print(f"Modern mind map has been saved as {output_file}")
 
     @staticmethod
     def wrap_text(text, max_width):
