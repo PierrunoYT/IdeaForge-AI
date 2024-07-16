@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 from docx import Document
 import networkx as nx
 import matplotlib.pyplot as plt
+import matplotlib.colors as mcolors
 
 # Load environment variables from .env file
 load_dotenv()
@@ -62,29 +63,32 @@ class BrainstormAgent:
             print()
 
     def create_networkx_mind_map(self, output_file="mind_map.png"):
-        """Create a NetworkX mind map from the generated ideas."""
-        G = nx.Graph()
+        """Create a visually appealing NetworkX mind map from the generated ideas."""
+        G = nx.DiGraph()
+        
+        # Color palette
+        colors = list(mcolors.TABLEAU_COLORS.values())
         
         # Add nodes and edges
         main_topic = list(self.mind_map.keys())[0]
-        G.add_node(main_topic, color='#FF9999', size=5000)
+        G.add_node(main_topic, color=colors[0], size=7000)
         
-        for subtopic, ideas in self.mind_map[main_topic].items():
-            G.add_node(subtopic, color='#99FF99', size=3000)
-            G.add_edge(main_topic, subtopic, color='#666666', width=2)
+        for i, (subtopic, ideas) in enumerate(self.mind_map[main_topic].items()):
+            subtopic_color = colors[(i + 1) % len(colors)]
+            G.add_node(subtopic, color=subtopic_color, size=5000)
+            G.add_edge(main_topic, subtopic)
             
-            for idea in ideas:
-                G.add_node(idea, color='#9999FF', size=1000)
-                G.add_edge(subtopic, idea, color='#CCCCCC', width=1)
+            for j, idea in enumerate(ideas):
+                idea_color = mcolors.to_rgba(subtopic_color, alpha=0.7)
+                G.add_node(idea, color=idea_color, size=3000)
+                G.add_edge(subtopic, idea)
         
         # Set up the plot
-        plt.figure(figsize=(16, 12))
+        plt.figure(figsize=(20, 15))
         pos = nx.spring_layout(G, k=0.9, iterations=50)
         
         # Draw edges
-        edge_colors = [G[u][v].get('color', '#000000') for u, v in G.edges()]
-        edge_widths = [G[u][v].get('width', 1) for u, v in G.edges()]
-        nx.draw_networkx_edges(G, pos, edge_color=edge_colors, width=edge_widths, alpha=0.7)
+        nx.draw_networkx_edges(G, pos, edge_color='gray', arrows=True, arrowsize=20, arrowstyle='->')
         
         # Draw nodes
         node_colors = [G.nodes[node]['color'] for node in G.nodes()]
@@ -93,14 +97,17 @@ class BrainstormAgent:
         
         # Draw labels
         labels = {node: self.wrap_text(node, 20) for node in G.nodes()}
-        font_sizes = {node: 12 if G.nodes[node]['size'] > 2000 else 8 for node in G.nodes()}
+        font_sizes = {node: 14 if G.nodes[node]['size'] > 5000 else 10 if G.nodes[node]['size'] > 3000 else 8 for node in G.nodes()}
         for node, (x, y) in pos.items():
-            plt.text(x, y, labels[node], fontsize=font_sizes[node], ha='center', va='center', wrap=True)
+            plt.text(x, y, labels[node], fontsize=font_sizes[node], ha='center', va='center', wrap=True, fontweight='bold')
+        
+        # Add a light background
+        plt.gca().set_facecolor('#F0F0F0')
         
         # Save the plot
         plt.axis('off')
         plt.tight_layout()
-        plt.savefig(output_file, format="png", dpi=300, bbox_inches="tight", facecolor='white', edgecolor='none')
+        plt.savefig(output_file, format="png", dpi=300, bbox_inches="tight", facecolor='#F0F0F0', edgecolor='none')
         plt.close()
         
         print(f"Mind map has been saved as {output_file}")
