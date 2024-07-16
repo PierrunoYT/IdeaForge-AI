@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 from docx import Document
 import networkx as nx
 import matplotlib.pyplot as plt
+import numpy as np
 import matplotlib.colors as mcolors
 from matplotlib.patches import Circle
 from matplotlib.collections import PatchCollection
