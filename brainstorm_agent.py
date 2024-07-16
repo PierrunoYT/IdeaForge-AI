@@ -120,13 +120,8 @@ class BrainstormAgent:
             
             for j, idea in enumerate(ideas):
                 idea_color = mcolors.to_rgba(subtopic_color, alpha=0.7)
-                sentiment_color = plt.cm.RdYlGn((idea['sentiment'] + 1) / 2)
-                G.add_node(idea['text'], color=idea_color, size=4000, sentiment=sentiment_color)
-                G.add_edge(subtopic, idea['text'])
-                
-                for keyword in idea['keywords']:
-                    G.add_node(keyword, color=idea_color, size=2000)
-                    G.add_edge(idea['text'], keyword)
+                G.add_node(idea, color=idea_color, size=4000)
+                G.add_edge(subtopic, idea)
         
         # Set up the plot
         plt.figure(figsize=(24, 18), facecolor='#f0f0f0')
@@ -142,11 +137,9 @@ class BrainstormAgent:
         for node, (x, y) in pos.items():
             color = G.nodes[node]['color']
             size = G.nodes[node]['size'] / 1000
-            sentiment_color = G.nodes[node].get('sentiment', color)
-            radial_gradient = mcolors.LinearSegmentedColormap.from_list("", [sentiment_color, "white"])
             circle = Circle((x, y), size/200, facecolor="none")
             plt.gca().add_patch(circle)
-            plt.gca().add_collection(PatchCollection([circle], facecolors=[radial_gradient(np.linspace(0, 1, 256))]))
+            plt.gca().add_collection(PatchCollection([circle], facecolors=[color]))
         
         # Draw labels
         labels = {node: self.wrap_text(node, 20) for node in G.nodes()}
