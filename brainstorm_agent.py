@@ -67,37 +67,65 @@ class BrainstormAgent:
         
         # Add nodes and edges
         main_topic = list(self.mind_map.keys())[0]
-        G.add_node(main_topic, color='lightblue', size=3000)
+        G.add_node(main_topic, color='#FF9999', size=5000)
         
         for subtopic, ideas in self.mind_map[main_topic].items():
-            G.add_node(subtopic, color='lightgreen', size=2000)
-            G.add_edge(main_topic, subtopic)
+            G.add_node(subtopic, color='#99FF99', size=3000)
+            G.add_edge(main_topic, subtopic, color='#666666', width=2)
             
             for idea in ideas:
-                G.add_node(idea, color='lightyellow', size=1000)
-                G.add_edge(subtopic, idea)
+                G.add_node(idea, color='#9999FF', size=1000)
+                G.add_edge(subtopic, idea, color='#CCCCCC', width=1)
         
         # Set up the plot
-        plt.figure(figsize=(12, 8))
+        plt.figure(figsize=(16, 12))
         pos = nx.spring_layout(G, k=0.9, iterations=50)
         
-        # Draw nodes
-        nx.draw_networkx_nodes(G, pos, node_size=[G.nodes[node]['size'] for node in G.nodes()],
-                               node_color=[G.nodes[node]['color'] for node in G.nodes()])
-        
         # Draw edges
-        nx.draw_networkx_edges(G, pos)
+        edge_colors = [G[u][v].get('color', '#000000') for u, v in G.edges()]
+        edge_widths = [G[u][v].get('width', 1) for u, v in G.edges()]
+        nx.draw_networkx_edges(G, pos, edge_color=edge_colors, width=edge_widths, alpha=0.7)
+        
+        # Draw nodes
+        node_colors = [G.nodes[node]['color'] for node in G.nodes()]
+        node_sizes = [G.nodes[node]['size'] for node in G.nodes()]
+        nx.draw_networkx_nodes(G, pos, node_color=node_colors, node_size=node_sizes, alpha=0.9)
         
         # Draw labels
-        nx.draw_networkx_labels(G, pos, font_size=8, font_weight="bold")
+        labels = {node: self.wrap_text(node, 20) for node in G.nodes()}
+        font_sizes = {node: 12 if G.nodes[node]['size'] > 2000 else 8 for node in G.nodes()}
+        for node, (x, y) in pos.items():
+            plt.text(x, y, labels[node], fontsize=font_sizes[node], ha='center', va='center', wrap=True)
         
         # Save the plot
         plt.axis('off')
         plt.tight_layout()
-        plt.savefig(output_file, format="png", dpi=300, bbox_inches="tight")
+        plt.savefig(output_file, format="png", dpi=300, bbox_inches="tight", facecolor='white', edgecolor='none')
         plt.close()
         
         print(f"Mind map has been saved as {output_file}")
+
+    @staticmethod
+    def wrap_text(text, max_width):
+        """Wrap text to a maximum width."""
+        words = text.split()
+        lines = []
+        current_line = []
+        current_length = 0
+
+        for word in words:
+            if current_length + len(word) <= max_width:
+                current_line.append(word)
+                current_length += len(word) + 1
+            else:
+                lines.append(' '.join(current_line))
+                current_line = [word]
+                current_length = len(word)
+
+        if current_line:
+            lines.append(' '.join(current_line))
+
+        return '\n'.join(lines)
 
 
     def write_ideas_to_word(self, filename="brainstorm_ideas.docx"):
