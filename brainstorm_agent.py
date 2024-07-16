@@ -1,5 +1,6 @@
 import requests
 import os
+import json
 from collections import defaultdict
 from dotenv import load_dotenv
 from docx import Document
@@ -9,6 +10,8 @@ import numpy as np
 import matplotlib.colors as mcolors
 from matplotlib.patches import Circle
 from matplotlib.collections import PatchCollection
+from textblob import TextBlob
+from rake_nltk import Rake
 
 # Load environment variables from .env file
 load_dotenv()
@@ -19,13 +22,25 @@ class BrainstormAgent:
         """Get user input for the brainstorming topic, output option, and language."""
         language = input("Choose language (1: English, 2: German): ")
         topic = input("Enter your brainstorming prompt: " if language == "1" else "Geben Sie Ihr Brainstorming-Thema ein: ")
-        output_option = input("Choose output option (1: Generate mind map, 2: Print ideas to Word file): " if language == "1" else "Wählen Sie die Ausgabeoption (1: Mindmap generieren, 2: Ideen in Word-Datei drucken): ")
+        output_option = input("Choose output option (1: Generate mind map, 2: Print ideas to Word file, 3: Export as JSON): " if language == "1" else "Wählen Sie die Ausgabeoption (1: Mindmap generieren, 2: Ideen in Word-Datei drucken, 3: Als JSON exportieren): ")
         return topic, output_option, language
+
     def __init__(self, api_key):
         self.ideas = []
         self.mind_map = defaultdict(list)
         self.api_key = api_key
         self.base_url = "https://openrouter.ai/api/v1/chat/completions"
+        self.rake = Rake()
+
+    def analyze_sentiment(self, text):
+        """Analyze the sentiment of the given text."""
+        blob = TextBlob(text)
+        return blob.sentiment.polarity
+
+    def extract_keywords(self, text):
+        """Extract keywords from the given text."""
+        self.rake.extract_keywords_from_text(text)
+        return self.rake.get_ranked_phrases()[:5]  # Return top 5 keywords
 
     def generate_ideas(self, topic, num_ideas=10, language="1"):
         """Generate a list of ideas related to the given topic using OpenRouter API."""
@@ -50,8 +65,17 @@ class BrainstormAgent:
         result = response.json()
         ideas_text = result['choices'][0]['message']['content']
         
-        self.ideas = [idea.strip() for idea in ideas_text.split('\n') if idea.strip()]
-        return self.ideas[:num_ideas]  # Ensure we return exactly num_ideas
+        raw_ideas = [idea.strip() for idea in ideas_text.split('\n') if idea.strip()]
+        self.ideas = []
+        for idea in raw_ideas[:num_ideas]:
+            sentiment = self.analyze_sentiment(idea)
+            keywords = self.extract_keywords(idea)
+            self.ideas.append({
+                "text": idea,
+                "sentiment": sentiment,
+                "keywords": keywords
+            })
+        return self.ideas
 
     def create_mind_map(self):
         """Create a mind map from the generated ideas."""
@@ -87,8 +111,13 @@ class BrainstormAgent:
             
             for j, idea in enumerate(ideas):
                 idea_color = mcolors.to_rgba(subtopic_color, alpha=0.7)
-                G.add_node(idea, color=idea_color, size=4000)
-                G.add_edge(subtopic, idea)
+                sentiment_color = plt.cm.RdYlGn((idea['sentiment'] + 1) / 2)
+                G.add_node(idea['text'], color=idea_color, size=4000, sentiment=sentiment_color)
+                G.add_edge(subtopic, idea['text'])
+                
+                for keyword in idea['keywords']:
+                    G.add_node(keyword, color=idea_color, size=2000)
+                    G.add_edge(idea['text'], keyword)
         
         # Set up the plot
         plt.figure(figsize=(24, 18), facecolor='#f0f0f0')
@@ -104,15 +133,15 @@ class BrainstormAgent:
         for node, (x, y) in pos.items():
             color = G.nodes[node]['color']
             size = G.nodes[node]['size'] / 1000
-            gradient = plt.cm.Blues(np.linspace(0.2, 0.8, 256))
-            radial_gradient = mcolors.LinearSegmentedColormap.from_list("", [color, "white"])
+            sentiment_color = G.nodes[node].get('sentiment', color)
+            radial_gradient = mcolors.LinearSegmentedColormap.from_list("", [sentiment_color, "white"])
             circle = Circle((x, y), size/200, facecolor="none")
             plt.gca().add_patch(circle)
             plt.gca().add_collection(PatchCollection([circle], facecolors=[radial_gradient(np.linspace(0, 1, 256))]))
         
         # Draw labels
         labels = {node: self.wrap_text(node, 20) for node in G.nodes()}
-        font_sizes = {node: 16 if G.nodes[node]['size'] > 6000 else 12 if G.nodes[node]['size'] > 4000 else 10 for node in G.nodes()}
+        font_sizes = {node: 16 if G.nodes[node]['size'] > 6000 else 12 if G.nodes[node]['size'] > 4000 else 8 for node in G.nodes()}
         for node, (x, y) in pos.items():
             plt.text(x, y, labels[node], fontsize=font_sizes[node], ha='center', va='center', wrap=True, fontweight='bold', color='#303030')
         
@@ -259,7 +288,21 @@ if __name__ == "__main__":
         ideas = agent.generate_ideas(topic, language=language)
         print("\nGenerated ideas:" if language == "1" else "\nGenerierte Ideen:")
         for idea in ideas:
-            print(f"- {idea}")
+            print(f"- {idea['text']}")
+            print(f"  Sentiment: {idea['sentiment']:.2f}")
+            print(f"  Keywords: {', '.join(idea['keywords'])}")
         agent.write_ideas_to_word()
+    elif output_option == "3":
+        print(f"\nGenerating mind map for: {topic}" if language == "1" else f"\nMindmap wird generiert für: {topic}")
+        mind_map = agent.generate_mind_map(topic, language)
+        if mind_map:
+            agent.export_mind_map_json()
+        else:
+            print("Failed to generate mind map. Please check your API key and try again." if language == "1" else "Fehler beim Generieren der Mindmap. Bitte überprüfen Sie Ihren API-Schlüssel und versuchen Sie es erneut.")
     else:
-        print("Invalid option selected. Please run the script again and choose either 1 or 2." if language == "1" else "Ungültige Option ausgewählt. Bitte führen Sie das Skript erneut aus und wählen Sie entweder 1 oder 2.")
+        print("Invalid option selected. Please run the script again and choose either 1, 2, or 3." if language == "1" else "Ungültige Option ausgewählt. Bitte führen Sie das Skript erneut aus und wählen Sie entweder 1, 2 oder 3.")
+    def export_mind_map_json(self, filename="mind_map.json"):
+        """Export the mind map as a JSON file."""
+        with open(filename, 'w') as f:
+            json.dump(self.mind_map, f, indent=2)
+        print(f"Mind map has been exported as {filename}")
